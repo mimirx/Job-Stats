@@ -32,19 +32,6 @@ app.get("/db-test", async (req, res) => {
     }
 })
 
-app.get("/create-test-user", async (req, res) => {
-    try {
-        const result = await pool.query(
-            "INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING *",
-            ["test@test.com", "123"]
-        )
-        res.json(result.rows[0])
-    } catch (err) {
-        console.error("Error creating test user:", err)
-        res.status(500).json({ error: "Failed to create test user" })
-    }
-})
-
 app.use("/applications", applicationRoutes)
 
 const PORT = process.env.PORT || 5000
