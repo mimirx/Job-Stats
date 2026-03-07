@@ -32,3 +32,12 @@ Content-Type: application/json
 
 ### Delete application
 DELETE http://localhost:5000/applications/3
+
+### authreg
+POST http://localhost:5000/auth/register
+Content-Type: application/json
+
+{
+  "email": "miro@test.com",
+  "password": "password123"
+}
