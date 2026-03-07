@@ -1,3 +1,8 @@
+![Node.js](https://img.shields.io/badge/Node.js-Express-green)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
+
 # Job Stats
 
 Job Stats is a full-stack web application for tracking job applications, interview stages, and job search statistics.
