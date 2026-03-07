@@ -4,5 +4,7 @@ const applicationController = require("../controllers/applicationController")
 
 router.get("/", applicationController.getApplications)
 router.post("/", applicationController.addApplication)
+router.put("/:id", applicationController.updateApplication)
+router.delete("/:id", applicationController.deleteApplication)
 
 module.exports = router

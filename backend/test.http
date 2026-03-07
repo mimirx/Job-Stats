@@ -1,3 +1,7 @@
+### Get all applications
+GET http://localhost:5000/applications
+
+### Create application
 POST http://localhost:5000/applications
 Content-Type: application/json
 
@@ -11,3 +15,20 @@ Content-Type: application/json
   "notes": "Applied through careers page",
   "userId": 1
 }
+
+### Update application
+PUT http://localhost:5000/applications/3
+Content-Type: application/json
+
+{
+  "company": "Epic Systems",
+  "position": "Software Developer",
+  "location": "Madison, WI",
+  "salary": 90000,
+  "status": "Interview",
+  "dateApplied": "2026-03-07",
+  "notes": "Moved to interview stage"
+}
+
+### Delete application
+DELETE http://localhost:5000/applications/3

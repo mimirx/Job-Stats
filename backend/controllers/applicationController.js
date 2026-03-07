@@ -45,7 +45,67 @@ const addApplication = async (req, res) => {
     }
 }
 
+const deleteApplication = async (req, res) => {
+    try {
+        const { id } = req.params
+        const deletedApplication = await applicationModel.deleteApplicationById(id)
+
+        if (!deletedApplication) {
+            return res.status(404).json({ error: "Application not found" })
+        }
+
+        res.json({
+            message: "Application deleted successfully",
+            application: deletedApplication
+        })
+    } catch (err) {
+        console.error("Error deleting application:", err)
+        res.status(500).json({ error: "Failed to delete application" })
+    }
+}
+
+const updateApplication = async (req, res) => {
+    try {
+        const { id } = req.params
+        const {
+            company,
+            position,
+            location,
+            salary,
+            status,
+            dateApplied,
+            notes
+        } = req.body
+
+        if (!company || !position) {
+            return res.status(400).json({ error: "company and position are required" })
+        }
+
+        const updatedApplication = await applicationModel.updateApplicationById(
+            id,
+            company,
+            position,
+            location || null,
+            salary || null,
+            status || "Applied",
+            dateApplied || null,
+            notes || null
+        )
+
+        if (!updatedApplication) {
+            return res.status(404).json({ error: "Application not found" })
+        }
+
+        res.json(updatedApplication)
+    } catch (err) {
+        console.error("Error updating application:", err)
+        res.status(500).json({ error: "Failed to update application" })
+    }
+}
+
 module.exports = {
     getApplications,
-    addApplication
+    addApplication,
+    deleteApplication,
+    updateApplication
 }
