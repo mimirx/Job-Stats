@@ -1,0 +1,13 @@
+POST http://localhost:5000/applications
+Content-Type: application/json
+
+{
+  "company": "Epic Systems",
+  "position": "Software Developer",
+  "location": "Madison, WI",
+  "salary": 85000,
+  "status": "Applied",
+  "dateApplied": "2026-03-07",
+  "notes": "Applied through careers page",
+  "userId": 1
+}
