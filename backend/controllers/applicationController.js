@@ -2,7 +2,7 @@ const applicationModel = require("../models/applicationModel")
 
 const getApplications = async (req, res) => {
     try {
-        const applications = await applicationModel.getAllApplications()
+        const applications = await applicationModel.getAllApplications(req.user.id)
         res.json(applications)
     } catch (err) {
         console.error("Error fetching applications:", err)
@@ -19,12 +19,11 @@ const addApplication = async (req, res) => {
             salary,
             status,
             dateApplied,
-            notes,
-            userId
+            notes
         } = req.body
 
-        if (!company || !position || !userId) {
-            return res.status(400).json({ error: "company, position, and userId are required" })
+        if (!company || !position) {
+            return res.status(400).json({ error: "company and position are required" })
         }
 
         const newApplication = await applicationModel.createApplication(
@@ -35,7 +34,7 @@ const addApplication = async (req, res) => {
             status || "Applied",
             dateApplied || null,
             notes || null,
-            userId
+            req.user.id
         )
 
         res.status(201).json(newApplication)
@@ -48,7 +47,7 @@ const addApplication = async (req, res) => {
 const deleteApplication = async (req, res) => {
     try {
         const { id } = req.params
-        const deletedApplication = await applicationModel.deleteApplicationById(id)
+        const deletedApplication = await applicationModel.deleteApplicationById(id, req.user.id)
 
         if (!deletedApplication) {
             return res.status(404).json({ error: "Application not found" })
@@ -89,7 +88,8 @@ const updateApplication = async (req, res) => {
             salary || null,
             status || "Applied",
             dateApplied || null,
-            notes || null
+            notes || null,
+            req.user.id
         )
 
         if (!updatedApplication) {

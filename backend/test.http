@@ -1,8 +1,10 @@
 ### Get all applications
 GET http://localhost:5000/applications
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJtaXJvQHRlc3QuY29tIiwiaWF0IjoxNzcyOTM3NjE4LCJleHAiOjE3NzMwMjQwMTh9.6mDz1Q3gpVGZLXkQtscWIb2xoEZx3ykWW30snVjQTSY
 
 ### Create application
 POST http://localhost:5000/applications
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJtaXJvQHRlc3QuY29tIiwiaWF0IjoxNzcyOTM3NjE4LCJleHAiOjE3NzMwMjQwMTh9.6mDz1Q3gpVGZLXkQtscWIb2xoEZx3ykWW30snVjQTSY
 Content-Type: application/json
 
 {
@@ -12,12 +14,12 @@ Content-Type: application/json
   "salary": 85000,
   "status": "Applied",
   "dateApplied": "2026-03-07",
-  "notes": "Applied through careers page",
-  "userId": 1
+  "notes": "Applied through careers page"
 }
 
 ### Update application
 PUT http://localhost:5000/applications/3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJtaXJvQHRlc3QuY29tIiwiaWF0IjoxNzcyOTM3NjE4LCJleHAiOjE3NzMwMjQwMTh9.6mDz1Q3gpVGZLXkQtscWIb2xoEZx3ykWW30snVjQTSY
 Content-Type: application/json
 
 {
@@ -33,8 +35,17 @@ Content-Type: application/json
 ### Delete application
 DELETE http://localhost:5000/applications/3
 
-### authreg
+### Register Request
 POST http://localhost:5000/auth/register
+Content-Type: application/json
+
+{
+  "email": "miro@test.com",
+  "password": "password123"
+}
+
+###
+POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
