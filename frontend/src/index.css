@@ -182,3 +182,48 @@ input {
 .addButton:hover {
     background: #1d4ed8;
 }
+
+.formCard {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.formCard h2 {
+    margin-bottom: 1rem;
+}
+
+.applicationForm {
+    display: grid;
+    gap: 1rem;
+}
+
+.applicationForm input,
+.applicationForm select,
+.applicationForm textarea {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1px solid #4b5563;
+    border-radius: 8px;
+    background-color: #111827;
+    color: white;
+}
+
+.applicationForm textarea {
+    resize: vertical;
+}
+
+.submitButton {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.submitButton:hover {
+    background-color: #1d4ed8;
+}
