@@ -44,6 +44,14 @@ function AnalyticsPage() {
     const interviews = applications.filter(app => app.status === "Interview").length
     const offers = applications.filter(app => app.status === "Offer").length
     const rejected = applications.filter(app => app.status === "Rejected").length
+    const total = applications.length
+
+    const chartColors = {
+        applied: "#3b82f6",
+        interview: "#f59e0b",
+        offer: "#22c55e",
+        rejected: "#ef4444"
+    }
 
     const doughnutData = {
         labels: ["Applied", "Interview", "Offer", "Rejected"],
@@ -51,13 +59,14 @@ function AnalyticsPage() {
             {
                 data: [applied, interviews, offers, rejected],
                 backgroundColor: [
-                    "#3b82f6",
-                    "#f59e0b",
-                    "#22c55e",
-                    "#ef4444"
+                    chartColors.applied,
+                    chartColors.interview,
+                    chartColors.offer,
+                    chartColors.rejected
                 ],
                 borderColor: "#1f2937",
-                borderWidth: 2
+                borderWidth: 3,
+                cutout: "52%"
             }
         ]
     }
@@ -66,13 +75,12 @@ function AnalyticsPage() {
         labels: ["Applied", "Interview", "Offer", "Rejected"],
         datasets: [
             {
-                label: "Applications by Status",
                 data: [applied, interviews, offers, rejected],
                 backgroundColor: [
-                    "#3b82f6",
-                    "#f59e0b",
-                    "#22c55e",
-                    "#ef4444"
+                    chartColors.applied,
+                    chartColors.interview,
+                    chartColors.offer,
+                    chartColors.rejected
                 ],
                 borderRadius: 8
             }
@@ -84,11 +92,18 @@ function AnalyticsPage() {
         maintainAspectRatio: false,
         plugins: {
             legend: {
+                position: "top",
                 labels: {
                     color: "#f9fafb",
                     font: {
                         size: 13
-                    }
+                    },
+                    boxWidth: 18
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: context => `${context.label}: ${context.raw}`
                 }
             }
         }
@@ -100,6 +115,11 @@ function AnalyticsPage() {
         plugins: {
             legend: {
                 display: false
+            },
+            tooltip: {
+                callbacks: {
+                    label: context => `Count: ${context.raw}`
+                }
             }
         },
         scales: {
@@ -127,8 +147,10 @@ function AnalyticsPage() {
     if (loading) {
         return (
             <div className="pageContainer">
-                <h1>Analytics</h1>
-                <p>Loading analytics...</p>
+                <div className="pageHeader">
+                    <h1>Analytics</h1>
+                    <p>Loading analytics...</p>
+                </div>
             </div>
         )
     }
@@ -136,8 +158,26 @@ function AnalyticsPage() {
     if (error) {
         return (
             <div className="pageContainer">
-                <h1>Analytics</h1>
-                <p className="errorText">{error}</p>
+                <div className="pageHeader">
+                    <h1>Analytics</h1>
+                    <p className="errorText">{error}</p>
+                </div>
+            </div>
+        )
+    }
+
+    if (total === 0) {
+        return (
+            <div className="pageContainer">
+                <div className="pageHeader">
+                    <h1>Analytics</h1>
+                    <p>Visual breakdown of your application progress.</p>
+                </div>
+
+                <div className="emptyAnalyticsCard">
+                    <h2>No analytics yet</h2>
+                    <p>Add some applications first and your charts will appear here.</p>
+                </div>
             </div>
         )
     }
@@ -147,6 +187,29 @@ function AnalyticsPage() {
             <div className="pageHeader">
                 <h1>Analytics</h1>
                 <p>Visual breakdown of your application progress.</p>
+            </div>
+
+            <div className="analyticsSummaryGrid">
+                <div className="analyticsMiniCard">
+                    <span>Total</span>
+                    <strong>{total}</strong>
+                </div>
+                <div className="analyticsMiniCard">
+                    <span>Applied</span>
+                    <strong>{applied}</strong>
+                </div>
+                <div className="analyticsMiniCard">
+                    <span>Interview</span>
+                    <strong>{interviews}</strong>
+                </div>
+                <div className="analyticsMiniCard">
+                    <span>Offer</span>
+                    <strong>{offers}</strong>
+                </div>
+                <div className="analyticsMiniCard">
+                    <span>Rejected</span>
+                    <strong>{rejected}</strong>
+                </div>
             </div>
 
             <div className="chartsGrid">

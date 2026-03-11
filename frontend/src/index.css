@@ -453,3 +453,67 @@ input {
 .chartWrapper {
     height: 260px;
 }
+
+.chartsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.chartCard {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.chartCard h2 {
+    margin-bottom: 1rem;
+}
+
+.chartWrapper {
+    height: 280px;
+}
+
+.analyticsSummaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.analyticsMiniCard {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.analyticsMiniCard span {
+    color: #d1d5db;
+    font-size: 0.95rem;
+}
+
+.analyticsMiniCard strong {
+    font-size: 1.8rem;
+}
+
+.emptyAnalyticsCard {
+    margin-top: 1.5rem;
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.emptyAnalyticsCard h2 {
+    margin-bottom: 0.75rem;
+}
+
+.emptyAnalyticsCard p {
+    color: #d1d5db;
+}
