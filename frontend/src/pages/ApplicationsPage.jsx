@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import api from "../api/api"
 
 function ApplicationsPage() {
@@ -6,6 +6,10 @@ function ApplicationsPage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
     const [showForm, setShowForm] = useState(false)
+    const [editingId, setEditingId] = useState(null)
+
+    const [searchTerm, setSearchTerm] = useState("")
+    const [statusFilter, setStatusFilter] = useState("All")
 
     const [company, setCompany] = useState("")
     const [position, setPosition] = useState("")
@@ -30,6 +34,19 @@ function ApplicationsPage() {
         fetchApplications()
     }, [])
 
+    const filteredApplications = useMemo(() => {
+        return applications.filter(application => {
+            const matchesSearch =
+                application.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                application.position.toLowerCase().includes(searchTerm.toLowerCase())
+
+            const matchesStatus =
+                statusFilter === "All" || application.status === statusFilter
+
+            return matchesSearch && matchesStatus
+        })
+    }, [applications, searchTerm, statusFilter])
+
     const resetForm = () => {
         setCompany("")
         setPosition("")
@@ -38,28 +55,75 @@ function ApplicationsPage() {
         setStatus("Applied")
         setDateApplied("")
         setNotes("")
+        setEditingId(null)
+    }
+
+    const handleOpenCreate = () => {
+        resetForm()
+        setShowForm(true)
+        setError("")
+    }
+
+    const handleOpenEdit = application => {
+        setEditingId(application.id)
+        setCompany(application.company || "")
+        setPosition(application.position || "")
+        setLocation(application.location || "")
+        setSalary(application.salary || "")
+        setStatus(application.status || "Applied")
+        setDateApplied(application.date_applied ? application.date_applied.slice(0, 10) : "")
+        setNotes(application.notes || "")
+        setShowForm(true)
+        setError("")
+    }
+
+    const handleCloseForm = () => {
+        setShowForm(false)
+        resetForm()
+        setError("")
     }
 
     const handleSubmit = async e => {
         e.preventDefault()
         setError("")
 
+        const payload = {
+            company,
+            position,
+            location,
+            salary: salary ? Number(salary) : null,
+            status,
+            dateApplied,
+            notes
+        }
+
         try {
-            await api.post("/applications", {
-                company,
-                position,
-                location,
-                salary: salary ? Number(salary) : null,
-                status,
-                dateApplied,
-                notes
-            })
+            if (editingId) {
+                await api.put(`/applications/${editingId}`, payload)
+            } else {
+                await api.post("/applications", payload)
+            }
 
             resetForm()
             setShowForm(false)
             fetchApplications()
         } catch (err) {
-            setError(err.response?.data?.error || "Failed to create application")
+            setError(err.response?.data?.error || "Failed to save application")
+        }
+    }
+
+    const handleDelete = async id => {
+        const confirmed = window.confirm("Are you sure you want to delete this application?")
+
+        if (!confirmed) {
+            return
+        }
+
+        try {
+            await api.delete(`/applications/${id}`)
+            fetchApplications()
+        } catch (err) {
+            setError(err.response?.data?.error || "Failed to delete application")
         }
     }
 
@@ -81,20 +145,39 @@ function ApplicationsPage() {
                         <p>Track and manage your job applications.</p>
                     </div>
 
-                    <button
-                        className="addButton"
-                        onClick={() => setShowForm(prev => !prev)}
-                    >
-                        {showForm ? "Close Form" : "+ Add Application"}
+                    <button className="addButton" onClick={handleOpenCreate}>
+                        + Add Application
                     </button>
                 </div>
+            </div>
+
+            <div className="filterBar">
+                <input
+                    type="text"
+                    placeholder="Search by company or position"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="filterInput"
+                />
+
+                <select
+                    value={statusFilter}
+                    onChange={e => setStatusFilter(e.target.value)}
+                    className="filterSelect"
+                >
+                    <option value="All">All Statuses</option>
+                    <option value="Applied">Applied</option>
+                    <option value="Interview">Interview</option>
+                    <option value="Offer">Offer</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
             </div>
 
             {error && <p className="errorText">{error}</p>}
 
             {showForm && (
                 <div className="formCard">
-                    <h2>Add New Application</h2>
+                    <h2>{editingId ? "Edit Application" : "Add New Application"}</h2>
 
                     <form onSubmit={handleSubmit} className="applicationForm">
                         <input
@@ -150,24 +233,58 @@ function ApplicationsPage() {
                             rows="4"
                         />
 
-                        <button type="submit" className="submitButton">
-                            Save Application
-                        </button>
+                        <div className="formActions">
+                            <button type="submit" className="submitButton">
+                                {editingId ? "Update Application" : "Save Application"}
+                            </button>
+
+                            <button
+                                type="button"
+                                className="cancelButton"
+                                onClick={handleCloseForm}
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </form>
                 </div>
             )}
 
-            {applications.length === 0 ? (
-                <p>No applications found.</p>
+            {filteredApplications.length === 0 ? (
+                <p>No matching applications found.</p>
             ) : (
                 <div className="applicationsList">
-                    {applications.map(application => (
+                    {filteredApplications.map(application => (
                         <div key={application.id} className="applicationCard">
-                            <h3>{application.company}</h3>
+                            <div className="applicationCardHeader">
+                                <h3>{application.company}</h3>
+
+                                <div className="cardActions">
+                                    <button
+                                        className="editButton"
+                                        onClick={() => handleOpenEdit(application)}
+                                    >
+                                        Edit
+                                    </button>
+
+                                    <button
+                                        className="deleteButton"
+                                        onClick={() => handleDelete(application.id)}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+
                             <p><strong>Position:</strong> {application.position}</p>
                             <p><strong>Location:</strong> {application.location || "N/A"}</p>
                             <p><strong>Salary:</strong> {application.salary || "N/A"}</p>
-                            <p><strong>Status:</strong> {application.status}</p>
+                            <p>
+                                <strong>Status:</strong>{" "}
+                                <span className={`statusBadge status${application.status}`}>
+                                    {application.status}
+                                </span>
+                            </p>
                             <p><strong>Date Applied:</strong> {application.date_applied ? application.date_applied.slice(0, 10) : "N/A"}</p>
                             <p><strong>Notes:</strong> {application.notes || "N/A"}</p>
                         </div>

@@ -11,14 +11,19 @@ function Navbar() {
 
     return (
         <nav className="navbar">
-            <div className="navbarBrand">Job Stats</div>
+            <Link to={token ? "/dashboard" : "/"} className="navbarBrand">
+                Job Stats
+            </Link>
 
             <div className="navbarLinks">
                 {token ? (
                     <>
                         <Link to="/dashboard">Dashboard</Link>
                         <Link to="/applications">Applications</Link>
-                        <button className="logoutButton" onClick={handleLogout}>Logout</button>
+                        <Link to="/analytics">Analytics</Link>
+                        <button className="logoutButton" onClick={handleLogout}>
+                            Logout
+                        </button>
                     </>
                 ) : (
                     <>
