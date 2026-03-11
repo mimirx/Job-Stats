@@ -79,7 +79,7 @@ function AnalyticsPage() {
         ]
     }
 
-    const chartOptions = {
+    const doughnutOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -90,6 +90,16 @@ function AnalyticsPage() {
                         size: 13
                     }
                 }
+            }
+        }
+    }
+
+    const barOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
             }
         },
         scales: {
@@ -143,14 +153,14 @@ function AnalyticsPage() {
                 <div className="chartCard">
                     <h2>Status Breakdown</h2>
                     <div className="chartWrapper">
-                        <Doughnut data={doughnutData} options={chartOptions} />
+                        <Doughnut data={doughnutData} options={doughnutOptions} />
                     </div>
                 </div>
 
                 <div className="chartCard">
                     <h2>Status Comparison</h2>
                     <div className="chartWrapper">
-                        <Bar data={barData} options={chartOptions} />
+                        <Bar data={barData} options={barOptions} />
                     </div>
                 </div>
             </div>
