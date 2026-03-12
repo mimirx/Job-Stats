@@ -312,7 +312,6 @@ svg {
 .applicationCard,
 .formCard,
 .chartCard,
-.analyticsMiniCard,
 .landingFeatureCard,
 .emptyAnalyticsCard {
     background-color: var(--card);
@@ -323,7 +322,6 @@ svg {
 
 .statCard,
 .chartCard,
-.analyticsMiniCard,
 .applicationCard,
 .formCard {
     padding: 1.6rem;
@@ -591,26 +589,6 @@ svg {
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 1.25rem;
     margin-top: 1rem;
-}
-
-.analyticsMiniCard {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-}
-
-.analyticsMiniCard span {
-    color: var(--text-soft);
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-}
-
-.analyticsMiniCard strong {
-    font-size: 2.1rem;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.03em;
 }
 
 .chartsGrid {

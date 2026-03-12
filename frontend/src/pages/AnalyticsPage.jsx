@@ -54,7 +54,7 @@ function AnalyticsPage() {
     }
 
     const doughnutData = {
-        labels: ["Applied", "Interview", "Offer", "Rejected"],
+        labels: ["Applied", "Interviews", "Offers", "Rejected"],
         datasets: [
             {
                 data: [applied, interviews, offers, rejected],
@@ -72,7 +72,7 @@ function AnalyticsPage() {
     }
 
     const barData = {
-        labels: ["Applied", "Interview", "Offer", "Rejected"],
+        labels: ["Applied", "Interviews", "Offers", "Rejected"],
         datasets: [
             {
                 data: [applied, interviews, offers, rejected],
@@ -193,26 +193,30 @@ function AnalyticsPage() {
                 <p>Visual breakdown of your application progress.</p>
             </div>
 
-            <div className="analyticsSummaryGrid">
-                <div className="analyticsMiniCard">
-                    <span>Total</span>
-                    <strong>{total}</strong>
+            <div className="statsGrid">
+                <div className="statCard">
+                    <h3>Total Applications</h3>
+                    <p>{total}</p>
                 </div>
-                <div className="analyticsMiniCard">
-                    <span>Applied</span>
-                    <strong>{applied}</strong>
+
+                <div className="statCard">
+                    <h3>Applied</h3>
+                    <p>{applied}</p>
                 </div>
-                <div className="analyticsMiniCard">
-                    <span>Interview</span>
-                    <strong>{interviews}</strong>
+
+                <div className="statCard">
+                    <h3>Interviews</h3>
+                    <p>{interviews}</p>
                 </div>
-                <div className="analyticsMiniCard">
-                    <span>Offer</span>
-                    <strong>{offers}</strong>
+
+                <div className="statCard">
+                    <h3>Offers</h3>
+                    <p>{offers}</p>
                 </div>
-                <div className="analyticsMiniCard">
-                    <span>Rejected</span>
-                    <strong>{rejected}</strong>
+
+                <div className="statCard">
+                    <h3>Rejected</h3>
+                    <p>{rejected}</p>
                 </div>
             </div>
 
