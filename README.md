@@ -101,29 +101,67 @@ PostgreSQL Database (Neon)
 # Project Structure
 
 ```
-job-stats
+Job-Stats
 │
 ├── backend
-│ ├── config
-│ │ └── db.js
-│ ├── controllers
-│ ├── middleware
-│ ├── routes
-│ └── server.js
+│   ├── config
+│   │   └── db.js
+│   │
+│   ├── controllers
+│   │   ├── applicationController.js
+│   │   └── authController.js
+│   │
+│   ├── middleware
+│   │   └── authMiddleware.js
+│   │
+│   ├── models
+│   │   ├── applicationModel.js
+│   │   └── userModel.js
+│   │
+│   ├── routes
+│   │   ├── applicationRoutes.js
+│   │   └── authRoutes.js
+│   │
+│   ├── server.js
+│   ├── package.json
+│   └── .env
 │
 ├── frontend
-│ ├── src
-│ │ ├── components
-│ │ ├── pages
-│ │ ├── services
-│ │ └── App.jsx
+│   ├── public
+│   │   └── vite.svg
+│   │
+│   ├── src
+│   │   ├── api
+│   │   │   └── api.js
+│   │   │
+│   │   ├── components
+│   │   │   ├── Navbar.jsx
+│   │   │   └── ProtectedRoute.jsx
+│   │   │
+│   │   ├── pages
+│   │   │   ├── AnalyticsPage.jsx
+│   │   │   ├── ApplicationsPage.jsx
+│   │   │   ├── DashboardPage.jsx
+│   │   │   ├── LandingPage.jsx
+│   │   │   ├── LoginPage.jsx
+│   │   │   └── RegisterPage.jsx
+│   │   │
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   │
+│   ├── index.html
+│   ├── vite.config.js
+│   └── package.json
 │
 ├── database
-│ └── schema.sql
+│   └── init.sql (database schema)
 │
 ├── docker-compose.yml
-├── README.md
-└── .gitignore
+├── .env.example
+├── .gitignore
+├── package.json
+└── README.md
 ```
 
 ---
