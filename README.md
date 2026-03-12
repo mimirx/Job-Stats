@@ -100,6 +100,7 @@ PostgreSQL Database (Neon)
 
 # Project Structure
 
+```
 job-stats
 │
 ├── backend
@@ -123,7 +124,7 @@ job-stats
 ├── docker-compose.yml
 ├── README.md
 └── .gitignore
-
+```
 
 ---
 
