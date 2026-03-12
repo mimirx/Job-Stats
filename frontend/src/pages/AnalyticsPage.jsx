@@ -47,10 +47,10 @@ function AnalyticsPage() {
     const total = applications.length
 
     const chartColors = {
-        applied: "#3b82f6",
-        interview: "#f59e0b",
-        offer: "#22c55e",
-        rejected: "#ef4444"
+        applied: "#b79a72",
+        interview: "#c89a4b",
+        offer: "#7b8b6a",
+        rejected: "#b56b5c"
     }
 
     const doughnutData = {
@@ -64,9 +64,9 @@ function AnalyticsPage() {
                     chartColors.offer,
                     chartColors.rejected
                 ],
-                borderColor: "#1f2937",
+                borderColor: "#faf6ef",
                 borderWidth: 3,
-                cutout: "52%"
+                cutout: "55%"
             }
         ]
     }
@@ -94,9 +94,10 @@ function AnalyticsPage() {
             legend: {
                 position: "top",
                 labels: {
-                    color: "#f9fafb",
+                    color: "#3b2f2a",
                     font: {
-                        size: 13
+                        size: 13,
+                        weight: 600
                     },
                     boxWidth: 18
                 }
@@ -125,20 +126,23 @@ function AnalyticsPage() {
         scales: {
             x: {
                 ticks: {
-                    color: "#f9fafb"
+                    color: "#3b2f2a",
+                    font: {
+                        weight: 600
+                    }
                 },
                 grid: {
-                    color: "rgba(255,255,255,0.08)"
+                    color: "rgba(90, 70, 45, 0.08)"
                 }
             },
             y: {
                 beginAtZero: true,
                 ticks: {
-                    color: "#f9fafb",
+                    color: "#3b2f2a",
                     stepSize: 1
                 },
                 grid: {
-                    color: "rgba(255,255,255,0.08)"
+                    color: "rgba(90, 70, 45, 0.08)"
                 }
             }
         }
