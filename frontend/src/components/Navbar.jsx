@@ -27,6 +27,7 @@ function Navbar() {
                             <Link to="/applications">Applications</Link>
                             <Link to="/interviews">Interviews</Link>
                             <Link to="/analytics">Analytics</Link>
+                            <Link to="/insights" className="navInsightsLink">✦ AI Insights</Link>
                             <button className="themeToggle" onClick={toggleTheme} title="Toggle dark mode">
                                 {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
                             </button>

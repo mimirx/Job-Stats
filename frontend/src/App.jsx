@@ -9,6 +9,7 @@ import DashboardPage from "./pages/DashboardPage"
 import ApplicationsPage from "./pages/ApplicationsPage"
 import AnalyticsPage from "./pages/AnalyticsPage"
 import InterviewsPage from "./pages/InterviewsPage"
+import InsightsPage from "./pages/InsightsPage"
 
 function AppRoutes() {
     const location = useLocation()
@@ -38,6 +39,10 @@ function AppRoutes() {
                 <Route
                     path="/interviews"
                     element={<ProtectedRoute><InterviewsPage /></ProtectedRoute>}
+                />
+                <Route
+                    path="/insights"
+                    element={<ProtectedRoute><InsightsPage /></ProtectedRoute>}
                 />
             </Routes>
         </AnimatePresence>
