@@ -2,8 +2,33 @@ const applicationModel = require("../models/applicationModel")
 
 const getApplications = async (req, res) => {
     try {
-        const applications = await applicationModel.getAllApplications(req.user.id)
-        res.json(applications)
+        const {
+            status,
+            search,
+            sortBy = "created_at",
+            sortOrder = "desc",
+            page = "1",
+            limit = "10"
+        } = req.query
+
+        const parsedPage = Math.max(1, parseInt(page, 10) || 1)
+        const parsedLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 10))
+
+        const result = await applicationModel.getAllApplications(req.user.id, {
+            status,
+            search,
+            sortBy,
+            sortOrder,
+            page: parsedPage,
+            limit: parsedLimit
+        })
+
+        res.json({
+            data: result.data,
+            total: result.total,
+            page: parsedPage,
+            totalPages: Math.ceil(result.total / parsedLimit)
+        })
     } catch (err) {
         console.error("Error fetching applications:", err)
         res.status(500).json({ error: "Failed to fetch applications" })
@@ -12,25 +37,13 @@ const getApplications = async (req, res) => {
 
 const addApplication = async (req, res) => {
     try {
-        const {
-            company,
-            position,
-            location,
-            salary,
-            status,
-            dateApplied,
-            notes
-        } = req.body
-
-        if (!company || !position) {
-            return res.status(400).json({ error: "company and position are required" })
-        }
+        const { company, position, location, salary, status, dateApplied, notes } = req.body
 
         const newApplication = await applicationModel.createApplication(
             company,
             position,
             location || null,
-            salary || null,
+            salary ? Number(salary) : null,
             status || "Applied",
             dateApplied || null,
             notes || null,
@@ -47,16 +60,13 @@ const addApplication = async (req, res) => {
 const deleteApplication = async (req, res) => {
     try {
         const { id } = req.params
-        const deletedApplication = await applicationModel.deleteApplicationById(id, req.user.id)
+        const deleted = await applicationModel.deleteApplicationById(id, req.user.id)
 
-        if (!deletedApplication) {
+        if (!deleted) {
             return res.status(404).json({ error: "Application not found" })
         }
 
-        res.json({
-            message: "Application deleted successfully",
-            application: deletedApplication
-        })
+        res.json({ message: "Application deleted successfully", application: deleted })
     } catch (err) {
         console.error("Error deleting application:", err)
         res.status(500).json({ error: "Failed to delete application" })
@@ -66,46 +76,29 @@ const deleteApplication = async (req, res) => {
 const updateApplication = async (req, res) => {
     try {
         const { id } = req.params
-        const {
-            company,
-            position,
-            location,
-            salary,
-            status,
-            dateApplied,
-            notes
-        } = req.body
+        const { company, position, location, salary, status, dateApplied, notes } = req.body
 
-        if (!company || !position) {
-            return res.status(400).json({ error: "company and position are required" })
-        }
-
-        const updatedApplication = await applicationModel.updateApplicationById(
+        const updated = await applicationModel.updateApplicationById(
             id,
             company,
             position,
             location || null,
-            salary || null,
+            salary ? Number(salary) : null,
             status || "Applied",
             dateApplied || null,
             notes || null,
             req.user.id
         )
 
-        if (!updatedApplication) {
+        if (!updated) {
             return res.status(404).json({ error: "Application not found" })
         }
 
-        res.json(updatedApplication)
+        res.json(updated)
     } catch (err) {
         console.error("Error updating application:", err)
         res.status(500).json({ error: "Failed to update application" })
     }
 }
 
-module.exports = {
-    getApplications,
-    addApplication,
-    deleteApplication,
-    updateApplication
-}
+module.exports = { getApplications, addApplication, deleteApplication, updateApplication }

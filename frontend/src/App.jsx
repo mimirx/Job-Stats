@@ -7,6 +7,7 @@ import RegisterPage from "./pages/RegisterPage"
 import DashboardPage from "./pages/DashboardPage"
 import ApplicationsPage from "./pages/ApplicationsPage"
 import AnalyticsPage from "./pages/AnalyticsPage"
+import InterviewsPage from "./pages/InterviewsPage"
 
 function App() {
     const token = localStorage.getItem("token")
@@ -26,31 +27,23 @@ function App() {
 
                 <Route
                     path="/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <DashboardPage />
-                        </ProtectedRoute>
-                    }
+                    element={<ProtectedRoute><DashboardPage /></ProtectedRoute>}
                 />
 
                 <Route
                     path="/applications"
-                    element={
-                        <ProtectedRoute>
-                            <ApplicationsPage />
-                        </ProtectedRoute>
-                    }
+                    element={<ProtectedRoute><ApplicationsPage /></ProtectedRoute>}
                 />
 
                 <Route
                     path="/analytics"
-                    element={
-                        <ProtectedRoute>
-                            <AnalyticsPage />
-                        </ProtectedRoute>
-                    }
+                    element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>}
                 />
-                
+
+                <Route
+                    path="/interviews"
+                    element={<ProtectedRoute><InterviewsPage /></ProtectedRoute>}
+                />
             </Routes>
         </BrowserRouter>
     )

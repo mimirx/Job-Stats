@@ -17,3 +17,21 @@ CREATE TABLE applications (
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_applications_user_id ON applications(user_id);
+CREATE INDEX idx_applications_status ON applications(status);
+CREATE INDEX idx_applications_date_applied ON applications(date_applied);
+
+CREATE TABLE interviews (
+    id SERIAL PRIMARY KEY,
+    application_id INTEGER REFERENCES applications(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    interview_type VARCHAR(50) NOT NULL,
+    scheduled_at TIMESTAMP NOT NULL,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_interviews_user_id ON interviews(user_id);
+CREATE INDEX idx_interviews_application_id ON interviews(application_id);
+CREATE INDEX idx_interviews_scheduled_at ON interviews(scheduled_at);

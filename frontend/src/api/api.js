@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "https://job-stats-905b.onrender.com"
+    baseURL: import.meta.env.VITE_API_URL || "https://job-stats-905b.onrender.com"
 })
 
 api.interceptors.request.use(config => {
