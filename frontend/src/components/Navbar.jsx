@@ -1,9 +1,11 @@
 import { Link, useNavigate } from "react-router-dom"
-import { BriefcaseBusiness } from "lucide-react"
+import { BriefcaseBusiness, Moon, Sun } from "lucide-react"
+import { useTheme } from "../context/ThemeContext"
 
 function Navbar() {
     const navigate = useNavigate()
     const token = localStorage.getItem("token")
+    const { theme, toggleTheme } = useTheme()
 
     const handleLogout = () => {
         localStorage.removeItem("token")
@@ -25,10 +27,16 @@ function Navbar() {
                             <Link to="/applications">Applications</Link>
                             <Link to="/interviews">Interviews</Link>
                             <Link to="/analytics">Analytics</Link>
+                            <button className="themeToggle" onClick={toggleTheme} title="Toggle dark mode">
+                                {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+                            </button>
                             <button className="logoutButton" onClick={handleLogout}>Logout</button>
                         </>
                     ) : (
                         <>
+                            <button className="themeToggle" onClick={toggleTheme} title="Toggle dark mode">
+                                {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+                            </button>
                             <Link to="/login">Login</Link>
                             <Link to="/register">Register</Link>
                         </>

@@ -1,4 +1,5 @@
 const applicationModel = require("../models/applicationModel")
+const activityModel = require("../models/activityModel")
 
 const getApplications = async (req, res) => {
     try {
@@ -50,6 +51,7 @@ const addApplication = async (req, res) => {
             req.user.id
         )
 
+        await activityModel.log(newApplication.id, req.user.id, "Application submitted")
         res.status(201).json(newApplication)
     } catch (err) {
         console.error("Error creating application:", err)
@@ -78,6 +80,8 @@ const updateApplication = async (req, res) => {
         const { id } = req.params
         const { company, position, location, salary, status, dateApplied, notes } = req.body
 
+        const existing = await applicationModel.getApplicationById(id, req.user.id)
+
         const updated = await applicationModel.updateApplicationById(
             id,
             company,
@@ -92,6 +96,13 @@ const updateApplication = async (req, res) => {
 
         if (!updated) {
             return res.status(404).json({ error: "Application not found" })
+        }
+
+        if (existing && existing.status !== (status || "Applied")) {
+            await activityModel.log(id, req.user.id, "Status changed", {
+                from: existing.status,
+                to: status || "Applied"
+            })
         }
 
         res.json(updated)

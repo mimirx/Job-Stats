@@ -2,6 +2,9 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import api from "../api/api"
 import { ApplicationCardSkeleton } from "../components/Skeleton"
+import KanbanView from "../components/KanbanView"
+import ActivityLog from "../components/ActivityLog"
+import { exportApplicationsToCsv } from "../utils/exportCsv"
 
 const SORT_OPTIONS = [
     { value: "created_at", label: "Date Added" },
@@ -19,9 +22,7 @@ const pageVariants = {
     exit: { opacity: 0, transition: { duration: 0.15 } }
 }
 
-const listVariants = {
-    animate: { transition: { staggerChildren: 0.06 } }
-}
+const listVariants = { animate: { transition: { staggerChildren: 0.06 } } }
 
 const cardVariants = {
     initial: { opacity: 0, y: 16 },
@@ -31,6 +32,7 @@ const cardVariants = {
 
 function ApplicationsPage() {
     const [applications, setApplications] = useState([])
+    const [allApplications, setAllApplications] = useState([])
     const [total, setTotal] = useState(0)
     const [totalPages, setTotalPages] = useState(1)
     const [loading, setLoading] = useState(true)
@@ -38,6 +40,7 @@ function ApplicationsPage() {
     const [error, setError] = useState("")
     const [showForm, setShowForm] = useState(false)
     const [editingId, setEditingId] = useState(null)
+    const [viewMode, setViewMode] = useState("list")
     const isFirstLoad = useRef(true)
 
     const [search, setSearch] = useState("")
@@ -55,24 +58,27 @@ function ApplicationsPage() {
     const [notes, setNotes] = useState("")
 
     const fetchApplications = useCallback(async () => {
-        if (isFirstLoad.current) {
-            setLoading(true)
-        } else {
-            setFetching(true)
-        }
+        if (isFirstLoad.current) setLoading(true)
+        else setFetching(true)
+
         try {
-            const params = {
-                page,
-                limit: PAGE_SIZE,
-                sortBy,
-                sortOrder,
-                ...(statusFilter && { status: statusFilter }),
-                ...(search && { search })
+            if (viewMode === "board") {
+                const res = await api.get("/applications", { params: { limit: 200, sortBy: "created_at", sortOrder: "desc" } })
+                setAllApplications(res.data.data)
+            } else {
+                const params = {
+                    page, limit: PAGE_SIZE, sortBy, sortOrder,
+                    ...(statusFilter && { status: statusFilter }),
+                    ...(search && { search })
+                }
+                const res = await api.get("/applications", { params })
+                setApplications(res.data.data)
+                setTotal(res.data.total)
+                setTotalPages(res.data.totalPages)
+
+                const allRes = await api.get("/applications", { params: { limit: 200, sortBy: "created_at", sortOrder: "desc" } })
+                setAllApplications(allRes.data.data)
             }
-            const response = await api.get("/applications", { params })
-            setApplications(response.data.data)
-            setTotal(response.data.total)
-            setTotalPages(response.data.totalPages)
             isFirstLoad.current = false
         } catch (err) {
             setError(err.response?.data?.error || "Failed to load applications")
@@ -80,15 +86,10 @@ function ApplicationsPage() {
             setLoading(false)
             setFetching(false)
         }
-    }, [page, sortBy, sortOrder, statusFilter, search])
+    }, [page, sortBy, sortOrder, statusFilter, search, viewMode])
 
-    useEffect(() => {
-        fetchApplications()
-    }, [fetchApplications])
-
-    useEffect(() => {
-        setPage(1)
-    }, [search, statusFilter, sortBy, sortOrder])
+    useEffect(() => { fetchApplications() }, [fetchApplications])
+    useEffect(() => { setPage(1) }, [search, statusFilter, sortBy, sortOrder])
 
     const resetForm = () => {
         setCompany(""); setPosition(""); setLocation(""); setSalary("")
@@ -113,11 +114,8 @@ function ApplicationsPage() {
         e.preventDefault(); setError("")
         const payload = { company, position, location, salary: salary ? Number(salary) : null, status, dateApplied, notes }
         try {
-            if (editingId) {
-                await api.put(`/applications/${editingId}`, payload)
-            } else {
-                await api.post("/applications", payload)
-            }
+            if (editingId) await api.put(`/applications/${editingId}`, payload)
+            else await api.post("/applications", payload)
             resetForm(); setShowForm(false); fetchApplications()
         } catch (err) {
             setError(err.response?.data?.error || "Failed to save application")
@@ -134,6 +132,19 @@ function ApplicationsPage() {
         }
     }
 
+    const handleStatusChange = async (id, newStatus) => {
+        const app = allApplications.find(a => a.id === id)
+        if (!app) return
+        setAllApplications(prev => prev.map(a => a.id === id ? { ...a, status: newStatus } : a))
+        try {
+            await api.put(`/applications/${id}`, { ...app, status: newStatus, dateApplied: app.date_applied })
+        } catch {
+            fetchApplications()
+        }
+    }
+
+    const handleExport = () => exportApplicationsToCsv(allApplications)
+
     const toggleSortOrder = () => setSortOrder(o => o === "desc" ? "asc" : "desc")
 
     return (
@@ -144,34 +155,53 @@ function ApplicationsPage() {
                         <h1>Applications</h1>
                         <p>Track and manage your job applications.</p>
                     </div>
-                    <button className="addButton" onClick={handleOpenCreate}>+ Add Application</button>
+                    <div className="pageHeaderActions">
+                        <div className="viewToggle">
+                            <button
+                                className={`viewToggleBtn ${viewMode === "list" ? "viewToggleBtnActive" : ""}`}
+                                onClick={() => setViewMode("list")}
+                            >
+                                ☰ List
+                            </button>
+                            <button
+                                className={`viewToggleBtn ${viewMode === "board" ? "viewToggleBtnActive" : ""}`}
+                                onClick={() => setViewMode("board")}
+                            >
+                                ⊞ Board
+                            </button>
+                        </div>
+                        <button className="exportButton" onClick={handleExport}>↓ Export CSV</button>
+                        <button className="addButton" onClick={handleOpenCreate}>+ Add Application</button>
+                    </div>
                 </div>
             </div>
 
-            <div className="filterBar">
-                <input
-                    type="text"
-                    placeholder="Search by company or position"
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    className="filterInput"
-                />
-                <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="filterSelect">
-                    <option value="">All Statuses</option>
-                    <option value="Applied">Applied</option>
-                    <option value="Interview">Interview</option>
-                    <option value="Offer">Offer</option>
-                    <option value="Rejected">Rejected</option>
-                </select>
-                <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="filterSelect">
-                    {SORT_OPTIONS.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                </select>
-                <button className="sortOrderButton" onClick={toggleSortOrder}>
-                    {sortOrder === "desc" ? "↓ Desc" : "↑ Asc"}
-                </button>
-            </div>
+            {viewMode === "list" && (
+                <div className="filterBar">
+                    <input
+                        type="text"
+                        placeholder="Search by company or position"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        className="filterInput"
+                    />
+                    <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="filterSelect">
+                        <option value="">All Statuses</option>
+                        <option value="Applied">Applied</option>
+                        <option value="Interview">Interview</option>
+                        <option value="Offer">Offer</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                    <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="filterSelect">
+                        {SORT_OPTIONS.map(opt => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                    </select>
+                    <button className="sortOrderButton" onClick={toggleSortOrder}>
+                        {sortOrder === "desc" ? "↓ Desc" : "↑ Asc"}
+                    </button>
+                </div>
+            )}
 
             {error && <p className="errorText">{error}</p>}
 
@@ -207,15 +237,41 @@ function ApplicationsPage() {
             </AnimatePresence>
 
             {loading ? (
-                <div className="applicationsList">
-                    {[...Array(5)].map((_, i) => <ApplicationCardSkeleton key={i} />)}
-                </div>
+                viewMode === "board" ? (
+                    <div className="kanbanBoard">
+                        {["Applied", "Interview", "Offer", "Rejected"].map(col => (
+                            <div key={col} className="kanbanColumn">
+                                <div className="kanbanColumnHeader">
+                                    <span className={`statusBadge status${col}`}>{col}</span>
+                                </div>
+                                <div className="kanbanCards">
+                                    {[...Array(2)].map((_, i) => (
+                                        <div key={i} className="kanbanCard">
+                                            <div className="skeleton" style={{ height: "1.2rem", width: "70%", marginBottom: "0.5rem" }} />
+                                            <div className="skeleton" style={{ height: "0.9rem", width: "50%" }} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="applicationsList">
+                        {[...Array(5)].map((_, i) => <ApplicationCardSkeleton key={i} />)}
+                    </div>
+                )
+            ) : viewMode === "board" ? (
+                <KanbanView
+                    applications={allApplications}
+                    onStatusChange={handleStatusChange}
+                    onEdit={handleOpenEdit}
+                    onDelete={handleDelete}
+                />
             ) : applications.length === 0 ? (
                 <p>No matching applications found.</p>
             ) : (
                 <>
                     <p className="resultsCount">{total} application{total !== 1 ? "s" : ""} found</p>
-
                     <motion.div
                         className="applicationsList"
                         style={{ opacity: fetching ? 0.5 : 1, transition: "opacity 0.2s ease" }}
@@ -242,6 +298,7 @@ function ApplicationsPage() {
                                 </p>
                                 <p><strong>Date Applied:</strong> {app.date_applied ? app.date_applied.slice(0, 10) : "N/A"}</p>
                                 <p><strong>Notes:</strong> {app.notes || "N/A"}</p>
+                                <ActivityLog applicationId={app.id} />
                             </motion.div>
                         ))}
                     </motion.div>

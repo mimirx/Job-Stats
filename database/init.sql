@@ -35,3 +35,14 @@ CREATE TABLE interviews (
 CREATE INDEX idx_interviews_user_id ON interviews(user_id);
 CREATE INDEX idx_interviews_application_id ON interviews(application_id);
 CREATE INDEX idx_interviews_scheduled_at ON interviews(scheduled_at);
+
+CREATE TABLE activity_log (
+    id SERIAL PRIMARY KEY,
+    application_id INTEGER REFERENCES applications(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    action VARCHAR(100) NOT NULL,
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_activity_log_application_id ON activity_log(application_id);

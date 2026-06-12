@@ -42,6 +42,14 @@ const getAllApplications = async (userId, { status, search, sortBy, sortOrder, p
     return { data: dataResult.rows, total }
 }
 
+const getApplicationById = async (id, userId) => {
+    const result = await pool.query(
+        `SELECT * FROM applications WHERE id = $1 AND user_id = $2`,
+        [id, userId]
+    )
+    return result.rows[0]
+}
+
 const createApplication = async (company, position, location, salary, status, dateApplied, notes, userId) => {
     const result = await pool.query(
         `INSERT INTO applications (company, position, location, salary, status, date_applied, notes, user_id)
@@ -74,6 +82,7 @@ const updateApplicationById = async (id, company, position, location, salary, st
 
 module.exports = {
     getAllApplications,
+    getApplicationById,
     createApplication,
     deleteApplicationById,
     updateApplicationById

@@ -37,6 +37,38 @@
     --status-rejected-border: #c79a8f;
 }
 
+[data-theme="dark"] {
+    --bg: #18120e;
+    --bg-soft: #211810;
+    --card: #261d16;
+    --card-2: #2e231a;
+    --border: #3d2e22;
+    --text: #f0e6da;
+    --text-soft: #9a7f6a;
+    --accent: #c4a07a;
+    --accent-dark: #d4b08a;
+    --accent-light: #3a2a1e;
+    --danger: #c97b6c;
+    --danger-dark: #d98c7c;
+    --white: #261d16;
+
+    --status-applied-bg: #2a2218;
+    --status-applied-text: #c4a87a;
+    --status-applied-border: #4a3820;
+
+    --status-interview-bg: #2e2410;
+    --status-interview-text: #d4a84a;
+    --status-interview-border: #5a4010;
+
+    --status-offer-bg: #1a2818;
+    --status-offer-text: #7ab87a;
+    --status-offer-border: #2a4a28;
+
+    --status-rejected-bg: #2a1a18;
+    --status-rejected-text: #c47a6a;
+    --status-rejected-border: #4a2820;
+}
+
 html,
 body,
 #root {
@@ -178,6 +210,27 @@ svg {
 .navbarLinks a:hover {
     background-color: var(--bg-soft);
     color: var(--accent-dark);
+}
+
+.themeToggle {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+}
+
+.themeToggle:hover {
+    background-color: var(--bg-soft);
+    color: var(--text);
+    border-color: var(--accent);
 }
 
 .logoutButton {
@@ -796,6 +849,197 @@ svg {
     color: var(--accent-dark);
 }
 
+/* View toggle + export */
+
+.pageHeaderActions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.viewToggle {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.viewToggleBtn {
+    background: none;
+    border: none;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.viewToggleBtn:hover {
+    background-color: var(--bg-soft);
+    color: var(--text);
+}
+
+.viewToggleBtnActive {
+    background-color: var(--accent);
+    color: var(--white);
+}
+
+.viewToggleBtnActive:hover {
+    background-color: var(--accent-dark);
+    color: var(--white);
+}
+
+.exportButton {
+    background-color: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0.72rem 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.97rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.exportButton:hover {
+    background-color: var(--bg-soft);
+    border-color: var(--accent);
+    color: var(--accent-dark);
+}
+
+/* Kanban board */
+
+.kanbanBoard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.kanbanColumn {
+    background-color: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem;
+    min-height: 200px;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.kanbanColumnOver {
+    border-color: var(--accent);
+    background-color: var(--accent-light);
+}
+
+.kanbanColumnHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.kanbanCount {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-soft);
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.15rem 0.55rem;
+}
+
+.kanbanCards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.kanbanEmpty {
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 0.9rem;
+    padding: 1.5rem 0;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+}
+
+.kanbanCard {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: grab;
+    box-shadow: 0 4px 12px rgba(92, 72, 46, 0.06);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.kanbanCard:hover {
+    box-shadow: 0 8px 20px rgba(92, 72, 46, 0.12);
+    border-color: var(--accent);
+}
+
+.kanbanCard:active {
+    cursor: grabbing;
+}
+
+.kanbanCardDragging {
+    opacity: 0.4;
+}
+
+.kanbanCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.kanbanCardHeader h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+}
+
+.kanbanPosition {
+    font-size: 0.9rem;
+    color: var(--text-soft);
+    margin-bottom: 0.25rem;
+}
+
+.kanbanMeta {
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    margin-bottom: 0.2rem;
+}
+
+.kanbanDate {
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    margin-top: 0.4rem;
+    font-weight: 600;
+}
+
+.kanbanCard .editButton,
+.kanbanCard .deleteButton {
+    padding: 0.3rem 0.55rem;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 1100px) {
+    .kanbanBoard {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .kanbanBoard {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Timeline */
 
 .timeline {
@@ -904,6 +1148,80 @@ svg {
 .typeOnsite    { background-color: #ddf5e8; color: #2e6b4a; border: 1px solid #9dd8bb; }
 .typeFinal     { background-color: #f5e8dd; color: #8a5a2e; border: 1px solid #d8b99d; }
 .typeOther     { background-color: #f0f0f0; color: #555555; border: 1px solid #cccccc; }
+
+/* Activity log */
+
+.activityLog {
+    margin-top: 0.85rem;
+    border-top: 1px solid var(--border);
+    padding-top: 0.75rem;
+}
+
+.activityToggle {
+    background: none;
+    border: none;
+    color: var(--text-soft);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.15s ease;
+}
+
+.activityToggle:hover {
+    color: var(--accent-dark);
+}
+
+.activityEntries {
+    overflow: hidden;
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.activityEntry {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+}
+
+.activityDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 0.3rem;
+}
+
+.activityContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.activityAction {
+    font-size: 0.9rem;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.activityMeta {
+    color: var(--text-soft);
+    font-weight: 400;
+}
+
+.activityDate {
+    font-size: 0.8rem;
+    color: var(--text-soft);
+}
+
+.activityLoading,
+.activityEmpty {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+}
 
 /* Wide chart card */
 
