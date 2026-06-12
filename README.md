@@ -36,22 +36,30 @@ Password: demopass188!
 - Register account
 - Login with JWT authentication
 - Secure protected routes
+- Rate limiting on auth endpoints
 
 ### Application Tracking
-- Create job applications
-- Edit application details
-- Delete applications
-- Track application statuses
+- Create, edit, and delete job applications
+- Server-side filtering by status and keyword search
+- Sorting by date, company, position, or salary
+- Paginated results with total count
+- Input validation on all fields
+
+### Interview Scheduling
+- Schedule interviews linked to applications
+- Categorize by type: Phone, Technical, Onsite, Final, Other
+- Timeline view split into upcoming and past interviews
 
 ### Dashboard
-- View job search overview
-- See recent applications
-- Quick summary statistics
+- Job search overview with live stats from the database
+- Recent applications at a glance
+- Response rate metric
 
 ### Analytics
-- Visualize job search progress
-- Chart-based statistics
-- Application status breakdown
+- Status breakdown (doughnut and bar charts)
+- Applications over time (weekly trend line chart)
+- Response rate and average salary
+- All stats computed via SQL aggregations
 
 ### Cloud Deployment
 - Frontend deployed on Vercel
@@ -197,7 +205,23 @@ Remove an application
 ## Statistics
 
 GET `/api/stats`  
-Retrieve dashboard analytics data
+Retrieve aggregated analytics: status breakdown, weekly trend, response rate, average salary
+
+---
+
+## Interviews
+
+GET `/api/interviews`  
+Retrieve all interviews for the logged-in user (joined with company and position)
+
+POST `/api/interviews`  
+Schedule a new interview linked to an application
+
+PUT `/api/interviews/:id`  
+Update interview details
+
+DELETE `/api/interviews/:id`  
+Remove an interview
 
 ---
 
@@ -258,16 +282,6 @@ Database hosted on **Neon PostgreSQL**
 Automatic deployments are triggered through **GitHub pushes**.
 
 ---
-
-# Future Improvements
-
-Possible future enhancements:
-
-- Resume upload for job applications
-- Email notifications for status updates
-- AI job search insights
-- Calendar integration for interview scheduling
-- Mobile responsive UI improvements
 
 ---
 
