@@ -1,5 +1,22 @@
 import { useEffect, useState } from "react"
+import { motion } from "framer-motion"
 import api from "../api/api"
+import { StatCardSkeleton, ApplicationCardSkeleton } from "../components/Skeleton"
+
+const pageVariants = {
+    initial: { opacity: 0, y: 18 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
+    exit: { opacity: 0, transition: { duration: 0.15 } }
+}
+
+const listVariants = {
+    animate: { transition: { staggerChildren: 0.07 } }
+}
+
+const itemVariants = {
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } }
+}
 
 function DashboardPage() {
     const [stats, setStats] = useState(null)
@@ -22,65 +39,84 @@ function DashboardPage() {
                 setLoading(false)
             }
         }
-
         fetchData()
     }, [])
 
     if (loading) {
         return (
-            <div className="pageContainer">
-                <div className="pageHeader"><h1>Dashboard</h1><p>Loading dashboard...</p></div>
-            </div>
+            <motion.div className="pageContainer" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                <div className="pageHeader">
+                    <h1>Dashboard</h1>
+                    <p>Overview of your job search activity.</p>
+                </div>
+                <div className="statsGrid">
+                    {[...Array(5)].map((_, i) => <StatCardSkeleton key={i} />)}
+                </div>
+                <div className="dashboardSection">
+                    <h2>Recent Applications</h2>
+                    <div className="applicationsList">
+                        {[...Array(3)].map((_, i) => <ApplicationCardSkeleton key={i} />)}
+                    </div>
+                </div>
+            </motion.div>
         )
     }
 
     if (error) {
         return (
-            <div className="pageContainer">
+            <motion.div className="pageContainer" variants={pageVariants} initial="initial" animate="animate" exit="exit">
                 <div className="pageHeader"><h1>Dashboard</h1><p className="errorText">{error}</p></div>
-            </div>
+            </motion.div>
         )
     }
 
     const { total, breakdown, responseRate } = stats
 
+    const statCards = [
+        { label: "Total Applications", value: total },
+        { label: "Applied", value: breakdown.Applied },
+        { label: "Interviews", value: breakdown.Interview },
+        { label: "Offers", value: breakdown.Offer },
+        { label: "Response Rate", value: `${responseRate}%` }
+    ]
+
     return (
-        <div className="pageContainer">
+        <motion.div className="pageContainer" variants={pageVariants} initial="initial" animate="animate" exit="exit">
             <div className="pageHeader">
                 <h1>Dashboard</h1>
                 <p>Overview of your job search activity.</p>
             </div>
 
-            <div className="statsGrid">
-                <div className="statCard"><h3>Total Applications</h3><p>{total}</p></div>
-                <div className="statCard"><h3>Applied</h3><p>{breakdown.Applied}</p></div>
-                <div className="statCard"><h3>Interviews</h3><p>{breakdown.Interview}</p></div>
-                <div className="statCard"><h3>Offers</h3><p>{breakdown.Offer}</p></div>
-                <div className="statCard"><h3>Response Rate</h3><p>{responseRate}%</p></div>
-            </div>
+            <motion.div className="statsGrid" variants={listVariants} initial="initial" animate="animate">
+                {statCards.map(card => (
+                    <motion.div key={card.label} className="statCard" variants={itemVariants}>
+                        <h3>{card.label}</h3>
+                        <p>{card.value}</p>
+                    </motion.div>
+                ))}
+            </motion.div>
 
             <div className="dashboardSection">
                 <h2>Recent Applications</h2>
-
                 {recentApplications.length === 0 ? (
                     <p>No applications yet.</p>
                 ) : (
-                    <div className="applicationsList">
-                        {recentApplications.map(application => (
-                            <div key={application.id} className="applicationCard">
-                                <h3>{application.company}</h3>
-                                <p><strong>Position:</strong> {application.position}</p>
+                    <motion.div className="applicationsList" variants={listVariants} initial="initial" animate="animate">
+                        {recentApplications.map(app => (
+                            <motion.div key={app.id} className="applicationCard" variants={itemVariants}>
+                                <h3>{app.company}</h3>
+                                <p><strong>Position:</strong> {app.position}</p>
                                 <p>
                                     <strong>Status:</strong>{" "}
-                                    <span className={`statusBadge status${application.status}`}>{application.status}</span>
+                                    <span className={`statusBadge status${app.status}`}>{app.status}</span>
                                 </p>
-                                <p><strong>Date Applied:</strong> {application.date_applied ? application.date_applied.slice(0, 10) : "N/A"}</p>
-                            </div>
+                                <p><strong>Date Applied:</strong> {app.date_applied ? app.date_applied.slice(0, 10) : "N/A"}</p>
+                            </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
                 )}
             </div>
-        </div>
+        </motion.div>
     )
 }
 

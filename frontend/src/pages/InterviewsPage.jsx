@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import api from "../api/api"
+import { TimelineCardSkeleton } from "../components/Skeleton"
 
 const INTERVIEW_TYPES = ["Phone", "Technical", "Onsite", "Final", "Other"]
 
@@ -11,15 +13,24 @@ const TYPE_COLORS = {
     Other: "typeOther"
 }
 
+const pageVariants = {
+    initial: { opacity: 0, y: 18 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
+    exit: { opacity: 0, transition: { duration: 0.15 } }
+}
+
+const listVariants = {
+    animate: { transition: { staggerChildren: 0.07 } }
+}
+
+const cardVariants = {
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } }
+}
+
 function formatDateTime(iso) {
     const d = new Date(iso)
-    return d.toLocaleString("default", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit"
-    })
+    return d.toLocaleString("default", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })
 }
 
 function isUpcoming(iso) {
@@ -36,7 +47,8 @@ function InterviewsPage() {
 
     const [applicationId, setApplicationId] = useState("")
     const [interviewType, setInterviewType] = useState("Phone")
-    const [scheduledAt, setScheduledAt] = useState("")
+    const [scheduledDate, setScheduledDate] = useState("")
+    const [scheduledTime, setScheduledTime] = useState("")
     const [notes, setNotes] = useState("")
 
     const fetchData = useCallback(async () => {
@@ -55,23 +67,14 @@ function InterviewsPage() {
         }
     }, [])
 
-    useEffect(() => {
-        fetchData()
-    }, [fetchData])
+    useEffect(() => { fetchData() }, [fetchData])
 
     const resetForm = () => {
-        setApplicationId("")
-        setInterviewType("Phone")
-        setScheduledAt("")
-        setNotes("")
-        setEditingId(null)
+        setApplicationId(""); setInterviewType("Phone")
+        setScheduledDate(""); setScheduledTime(""); setNotes(""); setEditingId(null)
     }
 
-    const handleOpenCreate = () => {
-        resetForm()
-        setShowForm(true)
-        setError("")
-    }
+    const handleOpenCreate = () => { resetForm(); setShowForm(true); setError("") }
 
     const handleOpenEdit = interview => {
         setEditingId(interview.id)
@@ -79,33 +82,26 @@ function InterviewsPage() {
         setInterviewType(interview.interview_type)
         const dt = new Date(interview.scheduled_at)
         const local = new Date(dt.getTime() - dt.getTimezoneOffset() * 60000)
-        setScheduledAt(local.toISOString().slice(0, 16))
+        const iso = local.toISOString()
+        setScheduledDate(iso.slice(0, 10))
+        setScheduledTime(iso.slice(11, 16))
         setNotes(interview.notes || "")
-        setShowForm(true)
-        setError("")
+        setShowForm(true); setError("")
     }
 
-    const handleCloseForm = () => {
-        setShowForm(false)
-        resetForm()
-        setError("")
-    }
+    const handleCloseForm = () => { setShowForm(false); resetForm(); setError("") }
 
     const handleSubmit = async e => {
-        e.preventDefault()
-        setError("")
-
+        e.preventDefault(); setError("")
+        const scheduledAt = scheduledDate && scheduledTime ? `${scheduledDate}T${scheduledTime}` : ""
         const payload = { applicationId: Number(applicationId), interviewType, scheduledAt, notes }
-
         try {
             if (editingId) {
                 await api.put(`/interviews/${editingId}`, payload)
             } else {
                 await api.post("/interviews", payload)
             }
-            resetForm()
-            setShowForm(false)
-            fetchData()
+            resetForm(); setShowForm(false); fetchData()
         } catch (err) {
             setError(err.response?.data?.error || "Failed to save interview")
         }
@@ -125,7 +121,7 @@ function InterviewsPage() {
     const past = interviews.filter(i => !isUpcoming(i.scheduled_at))
 
     return (
-        <div className="pageContainer">
+        <motion.div className="pageContainer" variants={pageVariants} initial="initial" animate="animate" exit="exit">
             <div className="pageHeader">
                 <div className="pageHeaderRow">
                     <div>
@@ -138,91 +134,105 @@ function InterviewsPage() {
 
             {error && <p className="errorText">{error}</p>}
 
-            {showForm && (
-                <div className="formCard">
-                    <h2>{editingId ? "Edit Interview" : "Schedule Interview"}</h2>
-                    <form onSubmit={handleSubmit} className="applicationForm">
-                        <select value={applicationId} onChange={e => setApplicationId(e.target.value)} required>
-                            <option value="">Select Application</option>
-                            {applications.map(app => (
-                                <option key={app.id} value={app.id}>
-                                    {app.company} — {app.position}
-                                </option>
-                            ))}
-                        </select>
-
-                        <select value={interviewType} onChange={e => setInterviewType(e.target.value)}>
-                            {INTERVIEW_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                        </select>
-
-                        <input
-                            type="datetime-local"
-                            value={scheduledAt}
-                            onChange={e => setScheduledAt(e.target.value)}
-                            required
-                        />
-
-                        <textarea
-                            placeholder="Notes (optional)"
-                            value={notes}
-                            onChange={e => setNotes(e.target.value)}
-                            rows="3"
-                        />
-
-                        <div className="formActions">
-                            <button type="submit" className="submitButton">
-                                {editingId ? "Update Interview" : "Save Interview"}
-                            </button>
-                            <button type="button" className="cancelButton" onClick={handleCloseForm}>Cancel</button>
-                        </div>
-                    </form>
-                </div>
-            )}
+            <AnimatePresence>
+                {showForm && (
+                    <motion.div
+                        className="formCard"
+                        initial={{ opacity: 0, y: -12 }}
+                        animate={{ opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" } }}
+                        exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
+                    >
+                        <h2>{editingId ? "Edit Interview" : "Schedule Interview"}</h2>
+                        <form onSubmit={handleSubmit} className="applicationForm">
+                            <div className="formField">
+                                <label className="formLabel">Application</label>
+                                <select value={applicationId} onChange={e => setApplicationId(e.target.value)} required>
+                                    <option value="">Select Application</option>
+                                    {applications.map(app => (
+                                        <option key={app.id} value={app.id}>{app.company} — {app.position}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="formField">
+                                <label className="formLabel">Interview Type</label>
+                                <select value={interviewType} onChange={e => setInterviewType(e.target.value)}>
+                                    {INTERVIEW_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div className="formFieldRow">
+                                <div className="formField">
+                                    <label className="formLabel">Date</label>
+                                    <input
+                                        type="date"
+                                        value={scheduledDate}
+                                        onChange={e => setScheduledDate(e.target.value)}
+                                        min="2020-01-01"
+                                        max="2035-12-31"
+                                        required
+                                    />
+                                </div>
+                                <div className="formField">
+                                    <label className="formLabel">Time</label>
+                                    <input
+                                        type="time"
+                                        value={scheduledTime}
+                                        onChange={e => setScheduledTime(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="formField">
+                                <label className="formLabel">Notes (optional)</label>
+                                <textarea placeholder="Prep notes, location, contact info..." value={notes} onChange={e => setNotes(e.target.value)} rows="3" />
+                            </div>
+                            <div className="formActions">
+                                <button type="submit" className="submitButton">{editingId ? "Update Interview" : "Save Interview"}</button>
+                                <button type="button" className="cancelButton" onClick={handleCloseForm}>Cancel</button>
+                            </div>
+                        </form>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {loading ? (
-                <p>Loading interviews...</p>
+                <div className="timeline">
+                    {[...Array(3)].map((_, i) => <TimelineCardSkeleton key={i} />)}
+                </div>
             ) : interviews.length === 0 ? (
-                <div className="emptyAnalyticsCard">
+                <motion.div className="emptyAnalyticsCard" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <h2>No interviews scheduled</h2>
                     <p>Schedule your first interview to start tracking your pipeline.</p>
-                </div>
+                </motion.div>
             ) : (
                 <>
                     {upcoming.length > 0 && (
                         <div className="dashboardSection">
                             <h2>Upcoming ({upcoming.length})</h2>
-                            <div className="timeline">
+                            <motion.div className="timeline" variants={listVariants} initial="initial" animate="animate">
                                 {upcoming.map(interview => (
-                                    <TimelineCard
-                                        key={interview.id}
-                                        interview={interview}
-                                        onEdit={handleOpenEdit}
-                                        onDelete={handleDelete}
-                                    />
+                                    <motion.div key={interview.id} variants={cardVariants}>
+                                        <TimelineCard interview={interview} onEdit={handleOpenEdit} onDelete={handleDelete} />
+                                    </motion.div>
                                 ))}
-                            </div>
+                            </motion.div>
                         </div>
                     )}
 
                     {past.length > 0 && (
                         <div className="dashboardSection">
                             <h2>Past ({past.length})</h2>
-                            <div className="timeline timelinePast">
+                            <motion.div className="timeline timelinePast" variants={listVariants} initial="initial" animate="animate">
                                 {[...past].reverse().map(interview => (
-                                    <TimelineCard
-                                        key={interview.id}
-                                        interview={interview}
-                                        onEdit={handleOpenEdit}
-                                        onDelete={handleDelete}
-                                        isPast
-                                    />
+                                    <motion.div key={interview.id} variants={cardVariants}>
+                                        <TimelineCard interview={interview} onEdit={handleOpenEdit} onDelete={handleDelete} isPast />
+                                    </motion.div>
                                 ))}
-                            </div>
+                            </motion.div>
                         </div>
                     )}
                 </>
             )}
-        </div>
+        </motion.div>
     )
 }
 
@@ -234,7 +244,6 @@ function TimelineCard({ interview, onEdit, onDelete, isPast }) {
                     {interview.interview_type}
                 </span>
             </div>
-
             <div className="timelineContent">
                 <div className="timelineHeader">
                     <div>
@@ -246,9 +255,7 @@ function TimelineCard({ interview, onEdit, onDelete, isPast }) {
                         <button className="deleteButton" onClick={() => onDelete(interview.id)}>Delete</button>
                     </div>
                 </div>
-
                 <p className="timelineDate">{formatDateTime(interview.scheduled_at)}</p>
-
                 {interview.notes && <p className="timelineNotes">{interview.notes}</p>}
             </div>
         </div>

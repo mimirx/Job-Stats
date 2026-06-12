@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react"
+import { motion } from "framer-motion"
 import api from "../api/api"
+import { StatCardSkeleton, ChartCardSkeleton } from "../components/Skeleton"
 import {
     Chart as ChartJS,
     ArcElement,
@@ -14,23 +16,28 @@ import {
 } from "chart.js"
 import { Doughnut, Bar, Line } from "react-chartjs-2"
 
-ChartJS.register(
-    ArcElement,
-    Tooltip,
-    Legend,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    PointElement,
-    LineElement,
-    Filler
-)
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Filler)
 
 const chartColors = {
     applied: "#b79a72",
     interview: "#c89a4b",
     offer: "#7b8b6a",
     rejected: "#b56b5c"
+}
+
+const pageVariants = {
+    initial: { opacity: 0, y: 18 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
+    exit: { opacity: 0, transition: { duration: 0.15 } }
+}
+
+const listVariants = {
+    animate: { transition: { staggerChildren: 0.07 } }
+}
+
+const itemVariants = {
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } }
 }
 
 function AnalyticsPage() {
@@ -47,23 +54,34 @@ function AnalyticsPage() {
 
     if (loading) {
         return (
-            <div className="pageContainer">
-                <div className="pageHeader"><h1>Analytics</h1><p>Loading analytics...</p></div>
-            </div>
+            <motion.div className="pageContainer" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                <div className="pageHeader">
+                    <h1>Analytics</h1>
+                    <p>Visual breakdown of your application progress.</p>
+                </div>
+                <div className="statsGrid" style={{ marginBottom: "1.5rem" }}>
+                    {[...Array(5)].map((_, i) => <StatCardSkeleton key={i} />)}
+                </div>
+                <div className="chartsGrid">
+                    <ChartCardSkeleton />
+                    <ChartCardSkeleton />
+                    <ChartCardSkeleton wide />
+                </div>
+            </motion.div>
         )
     }
 
     if (error) {
         return (
-            <div className="pageContainer">
+            <motion.div className="pageContainer" variants={pageVariants} initial="initial" animate="animate" exit="exit">
                 <div className="pageHeader"><h1>Analytics</h1><p className="errorText">{error}</p></div>
-            </div>
+            </motion.div>
         )
     }
 
     if (!stats || stats.total === 0) {
         return (
-            <div className="pageContainer">
+            <motion.div className="pageContainer" variants={pageVariants} initial="initial" animate="animate" exit="exit">
                 <div className="pageHeader">
                     <h1>Analytics</h1>
                     <p>Visual breakdown of your application progress.</p>
@@ -72,7 +90,7 @@ function AnalyticsPage() {
                     <h2>No analytics yet</h2>
                     <p>Add some applications first and your charts will appear here.</p>
                 </div>
-            </div>
+            </motion.div>
         )
     }
 
@@ -121,8 +139,7 @@ function AnalyticsPage() {
     }
 
     const doughnutOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         plugins: {
             legend: { position: "top", labels: { color: "#3b2f2a", font: { size: 13, weight: 600 }, boxWidth: 18 } },
             tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw}` } }
@@ -130,53 +147,66 @@ function AnalyticsPage() {
     }
 
     const barOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `Count: ${ctx.raw}` } } },
         scales: { x: sharedAxisStyles, y: { ...sharedAxisStyles, beginAtZero: true, ticks: { ...sharedAxisStyles.ticks, stepSize: 1 } } }
     }
 
     const lineOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.raw} application${ctx.raw !== 1 ? "s" : ""}` } } },
         scales: { x: sharedAxisStyles, y: { ...sharedAxisStyles, beginAtZero: true, ticks: { ...sharedAxisStyles.ticks, stepSize: 1 } } }
     }
 
+    const statCards = [
+        { label: "Total Applications", value: total },
+        { label: "Interviews", value: breakdown.Interview },
+        { label: "Offers", value: breakdown.Offer },
+        { label: "Response Rate", value: `${responseRate}%` },
+        ...(avgSalary ? [{ label: "Avg Salary", value: `$${Number(avgSalary).toLocaleString()}` }] : [])
+    ]
+
     return (
-        <div className="pageContainer">
+        <motion.div className="pageContainer" variants={pageVariants} initial="initial" animate="animate" exit="exit">
             <div className="pageHeader">
                 <h1>Analytics</h1>
                 <p>Visual breakdown of your application progress.</p>
             </div>
 
-            <div className="statsGrid">
-                <div className="statCard"><h3>Total Applications</h3><p>{total}</p></div>
-                <div className="statCard"><h3>Interviews</h3><p>{breakdown.Interview}</p></div>
-                <div className="statCard"><h3>Offers</h3><p>{breakdown.Offer}</p></div>
-                <div className="statCard"><h3>Response Rate</h3><p>{responseRate}%</p></div>
-                {avgSalary && <div className="statCard"><h3>Avg Salary</h3><p>${Number(avgSalary).toLocaleString()}</p></div>}
-            </div>
+            <motion.div className="statsGrid" variants={listVariants} initial="initial" animate="animate">
+                {statCards.map(card => (
+                    <motion.div key={card.label} className="statCard" variants={itemVariants}>
+                        <h3>{card.label}</h3>
+                        <p>{card.value}</p>
+                    </motion.div>
+                ))}
+            </motion.div>
 
-            <div className="chartsGrid">
-                <div className="chartCard">
+            <motion.div
+                className="chartsGrid"
+                variants={listVariants}
+                initial="initial"
+                animate="animate"
+                style={{ marginTop: "1.5rem" }}
+            >
+                <motion.div className="chartCard" variants={itemVariants}>
                     <h2>Status Breakdown</h2>
                     <div className="chartWrapper"><Doughnut data={doughnutData} options={doughnutOptions} /></div>
-                </div>
+                </motion.div>
 
-                <div className="chartCard">
+                <motion.div className="chartCard" variants={itemVariants}>
                     <h2>Status Comparison</h2>
                     <div className="chartWrapper"><Bar data={barData} options={barOptions} /></div>
-                </div>
+                </motion.div>
 
                 {weeklyTrend.length > 1 && (
-                    <div className="chartCard chartCardWide">
+                    <motion.div className="chartCard chartCardWide" variants={itemVariants}>
                         <h2>Applications Over Time</h2>
                         <div className="chartWrapper"><Line data={lineData} options={lineOptions} /></div>
-                    </div>
+                    </motion.div>
                 )}
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     )
 }
 

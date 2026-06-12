@@ -699,6 +699,41 @@ svg {
     }
 }
 
+/* Form fields with labels */
+
+.formField {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.formLabel {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-soft);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.formFieldRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Skeleton */
+
+@keyframes skeletonPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
+.skeleton {
+    background-color: var(--border);
+    border-radius: 8px;
+    animation: skeletonPulse 1.6s ease-in-out infinite;
+}
+
 /* Pagination */
 
 .resultsCount {
