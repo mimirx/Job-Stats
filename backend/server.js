@@ -29,10 +29,6 @@ app.use("/applications", applicationRoutes)
 app.use("/stats", statsRoutes)
 app.use("/interviews", interviewRoutes)
 
-pool.connect()
-    .then(() => console.log("Connected to PostgreSQL"))
-    .catch(err => console.error("Database connection error:", err))
-
 app.get("/", (req, res) => {
     res.send("Job Stats API running")
 })
