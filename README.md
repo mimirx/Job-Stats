@@ -1,3 +1,4 @@
+![CI](https://github.com/mimirx/Job-Stats/actions/workflows/ci.yml/badge.svg)
 ![Frontend](https://img.shields.io/badge/Frontend-React-blue)
 ![Backend](https://img.shields.io/badge/Backend-Node.js-green)
 ![API](https://img.shields.io/badge/API-Express-lightgrey)
@@ -8,22 +9,17 @@
 
 # Job Stats
 
-Job Stats is a full-stack web application that allows users to track job applications, monitor their progress through different stages, and analyze their job search using statistics and charts.
+Job Stats is a full-stack web application for tracking job applications from first contact to offer. Users can manage applications, schedule interviews, view analytics, and get AI-generated insights about their job search — all in one place.
 
-The platform provides a clean dashboard where users can manage applications, update statuses, and visualize their job search progress.
-
-This project demonstrates a modern full-stack architecture using **React, Node.js, Express, and PostgreSQL** deployed across multiple cloud services.
+Built as a portfolio project to demonstrate real-world full-stack development skills across React, Node.js, Express, and PostgreSQL, deployed across multiple cloud services.
 
 ---
 
 # Live Demo
 
-Frontend  
 https://job-stats-iota.vercel.app
 
 ### Demo Account
-
-Use the following credentials to explore the application:
 
 Email: demo1@demo.com  
 Password: demopass188!
@@ -33,255 +29,274 @@ Password: demopass188!
 # Features
 
 ### User Authentication
-- Register account
-- Login with JWT authentication
-- Secure protected routes
-- Rate limiting on auth endpoints
+- Register and login with JWT authentication
+- Protected routes — unauthenticated users are redirected to login
+- Rate limiting on auth endpoints (10 requests per 15 minutes)
+- Input validation with express-validator
 
 ### Application Tracking
 - Create, edit, and delete job applications
-- Server-side filtering by status and keyword search
-- Sorting by date, company, position, or salary
-- Paginated results with total count
-- Input validation on all fields
+- Server-side filtering by status and keyword search (ILIKE)
+- Sorting by date added, date applied, company, position, or salary
+- Paginated results (10 per page) with total count
+- Activity log per application — automatically records status changes
+
+### Kanban Board
+- Drag-and-drop board view organized by status (Applied, Interview, Offer, Rejected)
+- Optimistic UI updates — the board moves instantly, syncs in the background
+- Toggle between list and board view
 
 ### Interview Scheduling
-- Schedule interviews linked to applications
+- Schedule interviews linked to applications with date, time, and type
 - Categorize by type: Phone, Technical, Onsite, Final, Other
 - Timeline view split into upcoming and past interviews
 
-### Dashboard
-- Job search overview with live stats from the database
-- Recent applications at a glance
-- Response rate metric
-
 ### Analytics
-- Status breakdown (doughnut and bar charts)
-- Applications over time (weekly trend line chart)
-- Response rate and average salary
-- All stats computed via SQL aggregations
+- Status breakdown (doughnut and bar charts via Chart.js)
+- Weekly application trend (line chart)
+- Response rate and average salary target
+- All stats computed via SQL aggregations on the server
 
-### Cloud Deployment
-- Frontend deployed on Vercel
-- Backend API deployed on Render
-- PostgreSQL database hosted on Neon
+### AI Insights
+- One-click AI analysis of job search data powered by Google Gemini
+- Streaming response — text appears word-by-word in real time
+- Covers: overall assessment, what's working, areas to improve, action plan
+- Rate limited to 5 requests per 15 minutes
+
+### Dark Mode
+- Full dark/light theme toggle
+- Preference persisted in localStorage
+- Implemented with CSS custom properties and a React context
+
+### CSV Export
+- Export all applications to a `.csv` file with one click
+- Client-side generation via Blob API — no server round-trip
+
+### Quality
+- 16 backend tests covering auth, applications CRUD, and stats (Jest + Supertest)
+- GitHub Actions CI — tests run automatically on every push to main
 
 ---
 
 # Tech Stack
 
 ## Frontend
-- React
-- Vite
-- Chart.js
-- Tailwind CSS
+- React 18 + Vite
+- Framer Motion (page transitions, staggered animations)
+- Chart.js + react-chartjs-2
+- React Router v6
+- Custom CSS with CSS variables for theming
 
 ## Backend
-- Node.js
-- Express.js
-- JWT Authentication
-- REST API
+- Node.js + Express 5
+- JWT authentication (jsonwebtoken + bcrypt)
+- express-validator for input validation
+- express-rate-limit for rate limiting
+- @google/generative-ai (Gemini API)
 
 ## Database
-- PostgreSQL
-- Neon serverless database
+- PostgreSQL (Neon serverless)
+- Raw SQL with parameterized queries (pg)
+- SQL aggregations: COUNT GROUP BY, DATE_TRUNC, AVG
 
 ## Infrastructure
-- Vercel (Frontend hosting)
-- Render (Backend hosting)
-- Neon (Cloud PostgreSQL)
-- GitHub (Version control)
+- Vercel — frontend hosting with SPA rewrites
+- Render — backend hosting
+- Neon — serverless PostgreSQL
+- GitHub Actions — CI/CD pipeline
 
 ---
 
 # Architecture
 
-Browser  
-↓  
-React Frontend (Vercel)  
-↓  
-Node.js / Express API (Render)  
-↓  
+```
+Browser
+  ↓
+React Frontend (Vercel)
+  ↓
+Node.js / Express REST API (Render)
+  ↓
 PostgreSQL Database (Neon)
+        +
+Google Gemini API (AI Insights)
+```
 
 ---
 
 # Project Structure
 
 ```
-Job-Stats
+Job-Stats/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 │
-├── backend
-│   ├── config
+├── backend/
+│   ├── config/
 │   │   └── db.js
-│   │
-│   ├── controllers
+│   ├── controllers/
 │   │   ├── applicationController.js
-│   │   └── authController.js
-│   │
-│   ├── middleware
-│   │   └── authMiddleware.js
-│   │
-│   ├── models
+│   │   ├── authController.js
+│   │   └── interviewController.js
+│   ├── middleware/
+│   │   ├── authMiddleware.js
+│   │   └── validate.js
+│   ├── models/
+│   │   ├── activityModel.js
 │   │   ├── applicationModel.js
+│   │   ├── statsModel.js
 │   │   └── userModel.js
-│   │
-│   ├── routes
+│   ├── routes/
 │   │   ├── applicationRoutes.js
-│   │   └── authRoutes.js
-│   │
-│   ├── server.js
-│   ├── package.json
-│   └── .env
+│   │   ├── authRoutes.js
+│   │   ├── insightsRoutes.js
+│   │   ├── interviewRoutes.js
+│   │   └── statsRoutes.js
+│   ├── tests/
+│   │   ├── auth.test.js
+│   │   ├── applications.test.js
+│   │   └── stats.test.js
+│   └── server.js
 │
-├── frontend
-│   ├── public
-│   │   └── vite.svg
-│   │
-│   ├── src
-│   │   ├── api
-│   │   │   └── api.js
-│   │   │
-│   │   ├── components
-│   │   │   ├── Navbar.jsx
-│   │   │   └── ProtectedRoute.jsx
-│   │   │
-│   │   ├── pages
-│   │   │   ├── AnalyticsPage.jsx
-│   │   │   ├── ApplicationsPage.jsx
-│   │   │   ├── DashboardPage.jsx
-│   │   │   ├── LandingPage.jsx
-│   │   │   ├── LoginPage.jsx
-│   │   │   └── RegisterPage.jsx
-│   │   │
-│   │   ├── App.jsx
-│   │   ├── index.css
-│   │   └── main.jsx
-│   │
-│   ├── index.html
-│   ├── vite.config.js
-│   └── package.json
+├── frontend/
+│   └── src/
+│       ├── api/
+│       │   └── api.js
+│       ├── components/
+│       │   ├── ActivityLog.jsx
+│       │   ├── KanbanView.jsx
+│       │   ├── Navbar.jsx
+│       │   ├── ProtectedRoute.jsx
+│       │   └── Skeleton.jsx
+│       ├── context/
+│       │   └── ThemeContext.jsx
+│       ├── pages/
+│       │   ├── AnalyticsPage.jsx
+│       │   ├── ApplicationsPage.jsx
+│       │   ├── DashboardPage.jsx
+│       │   ├── InsightsPage.jsx
+│       │   ├── InterviewsPage.jsx
+│       │   ├── LandingPage.jsx
+│       │   ├── LoginPage.jsx
+│       │   └── RegisterPage.jsx
+│       ├── utils/
+│       │   └── exportCsv.js
+│       ├── App.jsx
+│       ├── index.css
+│       └── main.jsx
 │
-├── database
-│   └── init.sql (database schema)
-│
-├── docker-compose.yml
-├── .env.example
-├── .gitignore
-├── package.json
-└── README.md
+└── database/
+    └── init.sql
 ```
 
 ---
 
 # API Endpoints
 
-## Authentication
+All endpoints except `/auth` require a `Authorization: Bearer <token>` header.
 
-POST `/api/auth/register`  
-Create a new user account
-
-POST `/api/auth/login`  
-Authenticate user and return JWT token
-
----
+## Auth
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/auth/register` | Create account, returns user object |
+| POST | `/auth/login` | Authenticate, returns JWT token |
 
 ## Applications
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/applications` | List applications (filterable, sortable, paginated) |
+| POST | `/applications` | Create application |
+| PUT | `/applications/:id` | Update application |
+| DELETE | `/applications/:id` | Delete application |
+| GET | `/applications/:id/activity` | Get activity log for an application |
 
-GET `/api/applications`  
-Retrieve all applications for the logged-in user
-
-POST `/api/applications`  
-Create a new job application
-
-PUT `/api/applications/:id`  
-Update application details
-
-DELETE `/api/applications/:id`  
-Remove an application
-
----
-
-## Statistics
-
-GET `/api/stats`  
-Retrieve aggregated analytics: status breakdown, weekly trend, response rate, average salary
-
----
+## Stats
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/stats` | Status breakdown, weekly trend, response rate, avg salary |
 
 ## Interviews
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/interviews` | List interviews (joined with application data) |
+| POST | `/interviews` | Schedule an interview |
+| PUT | `/interviews/:id` | Update interview |
+| DELETE | `/interviews/:id` | Delete interview |
 
-GET `/api/interviews`  
-Retrieve all interviews for the logged-in user (joined with company and position)
-
-POST `/api/interviews`  
-Schedule a new interview linked to an application
-
-PUT `/api/interviews/:id`  
-Update interview details
-
-DELETE `/api/interviews/:id`  
-Remove an interview
+## Insights
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/insights` | Stream AI analysis of job search data (Gemini) |
 
 ---
 
 # Running Locally
 
-## 1 Clone repository
+### 1. Clone the repository
+```bash
 git clone https://github.com/mimirx/Job-Stats.git
-
 cd Job-Stats
+```
 
----
-
-## 2 Start database
-docker compose up
-
----
-
-## 3 Start backend
+### 2. Set up the backend
+```bash
 cd backend
 npm install
+```
+
+Create `backend/.env`:
+```
+PORT=5000
+DATABASE_URL=your_neon_connection_string
+JWT_SECRET=your_secret_key
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+```bash
 npm run dev
+```
 
-Backend will run on:
-http://localhost:5000
+Backend runs on `http://localhost:5000`
 
----
-
-## 4 Start frontend
+### 3. Set up the frontend
+```bash
 cd frontend
 npm install
+```
+
+Create `frontend/.env`:
+```
+VITE_API_URL=http://localhost:5000
+```
+
+```bash
 npm run dev
+```
 
-Frontend will run on:
-http://localhost:5173
+Frontend runs on `http://localhost:5173`
 
+### 4. Run tests
+```bash
+cd backend
+npm test
+```
 
 ---
 
 # Environment Variables
 
-### Backend `.env`
-DATABASE_URL=your_database_connection
-JWT_SECRET=your_secret_key
+### Backend
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Neon PostgreSQL connection string |
+| `JWT_SECRET` | Secret key for signing JWTs |
+| `GEMINI_API_KEY` | Google AI Studio API key (free tier) |
+| `PORT` | Server port (default 5000) |
 
-### Frontend `.env`
-VITE_API_URL=http://localhost:5000
-
----
-
-# Deployment
-
-Frontend deployed on **Vercel**
-
-Backend deployed on **Render**
-
-Database hosted on **Neon PostgreSQL**
-
-Automatic deployments are triggered through **GitHub pushes**.
-
----
+### Frontend
+| Variable | Description |
+|----------|-------------|
+| `VITE_API_URL` | Backend API base URL |
 
 ---
 
